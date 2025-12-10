@@ -9,7 +9,7 @@ class Food:
         rand_y = randint(0, self.board_size - 1)
         self.position = (rand_x, rand_y)
 
-    # 回傳食物當前的座標（檢查是否吃到用）
+    # 回傳食物當前的座標
     def get_position(self):
         return self.position
 
