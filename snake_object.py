@@ -1,7 +1,6 @@
 from collections import deque
 
 class Snake:
-    # UP = 0, DOWN = 1, LEFT = 2, RIGHT = 3
     # left top = (0, 0)
     DIRECTIONS = {
         'UP': (0, -1),
@@ -31,11 +30,11 @@ class Snake:
     def get_head_positions(self):
         return self.body[0]
     
-    # 回傳蛇蛇的長度（獎勵機制的分數用）
+    # 回傳蛇蛇的長度
     def get_length(self):
         return len(self.body)
     
-    # 回傳蛇身位置 (檢查 Food有沒有跟 body重疊用)
+    # 回傳蛇身位置
     def get_body_positions(self):
         return list(self.body)
     
