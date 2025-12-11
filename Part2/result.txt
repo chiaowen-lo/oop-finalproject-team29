@@ -1,0 +1,5 @@
+Model: SARSA
+Map Seed: 975
+Map File: frozen_lake_map.txt
+Success Rate: 80.00%
+Parameters: LR=0.1, Gamma=0.99
