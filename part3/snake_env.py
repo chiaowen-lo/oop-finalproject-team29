@@ -87,7 +87,7 @@ class SnakeEnv(gym.Env):
         if head_pos == food_pos:
             reward = 10   
             self.snake.grow() 
-            self.food.respawn(self.snake.body) # 呼叫 Food 的重生邏輯
+            self.food.respawn(self.snake.get_body_positions()) # 呼叫 Food 的重生邏輯
         
         # 撞牆或吃到自己
         elif self.snake.is_touching_wall() or self.snake.is_touching_self():
