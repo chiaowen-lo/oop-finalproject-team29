@@ -84,7 +84,7 @@ def train_sarsa_agent(map_desc):
 
     rng = np.random.default_rng()
     
-    # --- 修改點 1: 建立一個陣列來記錄每一場有沒有贏 ---
+    # 建立一個陣列來記錄每一場有沒有贏
     rewards_history = np.zeros(episodes)
 
     for i in range(episodes):
@@ -170,7 +170,7 @@ if __name__ == '__main__':
         # 1. 隨機生成新地圖
         current_seed = int(np.random.randint(0, 1000))
         # p=0.8 提高安全地機率，讓好地圖更容易出現
-        current_map = generate_random_map(size=8, p=0.8, seed=current_seed)
+        current_map = generate_random_map(size=8, p=0.80, seed=current_seed)
         
         print(f"嘗試第 {attempt} 張地圖 (Seed: {current_seed})...", end=" ")
         
