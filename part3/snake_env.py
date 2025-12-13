@@ -2,10 +2,16 @@ import gymnasium as gym
 from gymnasium import spaces
 from gymnasium.envs.registration import register
 import numpy as np
+import pygame
+DARK_GRAY = (169, 169, 169)
+BLACK = (0, 0, 0) 
+PERSIMMON = (255, 77, 64)
+YELLOW_GREEN = (154, 205, 50)
+OLIVE_GREEN = (85, 107, 47)
 
 # 導入物件
-from .snake_object import Snake 
-from .food_object import Food 
+from snake_object import Snake 
+from food_object import Food 
 
 # Register this module as a gym environment.
 register(
@@ -43,6 +49,10 @@ class SnakeEnv(gym.Env):
         self.current_step = 0
         self.max_steps = size * size * 2 
 
+        # 初始化 pygame 相關屬性
+        self.window = None
+        self.clock = None
+
     # 2. 重置環境 (Reset) - 體現抽象
     def reset(self, seed=None, options=None):
         super().reset(seed=seed) 
@@ -54,7 +64,7 @@ class SnakeEnv(gym.Env):
         self.food.respawn(self.snake.body)
         
         # 構建初始觀察狀態
-        head_x, head_y = self.snake.get_head_position()
+        head_x, head_y = self.snake.get_head_positions()
         food_x, food_y = self.food.get_position() 
         
         obs = np.array([head_x, head_y, food_x, food_y], dtype=np.int32)
@@ -76,7 +86,7 @@ class SnakeEnv(gym.Env):
         self.snake.move()                     
 
         # 2. 判斷獎勵與終止
-        head_pos = self.snake.get_head_position()
+        head_pos = self.snake.get_head_positions()
         food_pos = self.food.get_position()
         
         reward = 0
@@ -117,16 +127,81 @@ class SnakeEnv(gym.Env):
 
     # 4. 畫面繪製 (Render)
     def render(self):
-        # 呼叫組員 C 的繪製邏輯
-        # self.snake.render() 
-        # self.food.render()
-        pass
+        if self.render_mode == "human":
+            # 初始化 pygame window
+            if self.window is None:
+                pygame.init()
+                pygame.display.init()
+                PIXEL_SIZE = 40
+                self.window_size = self.grid_size * PIXEL_SIZE
+                self.window = pygame.display.set_mode((self.window_size, self.window_size))
+                self.clock = pygame.time.Clock()
+                pygame.display.set_caption("Greedy Snake")
+            self.window.fill(BLACK)
+            # 單一網格單元的尺寸
+            cell_size = self.window_size // self.grid_size
+            
+            # 畫食物
+            food_pos = self.food.get_position()
+            food_x, food_y = food_pos
+            # 繪製食物方塊 (PERSIMMON 柿子橙)
+            pygame.draw.rect(
+                self.window,
+                PERSIMMON,
+                (food_x * cell_size, food_y * cell_size, cell_size, cell_size)
+            )
+
+            # 畫蛇蛇
+            snake_body = self.snake.get_body_positions()
+            for i, (x, y) in enumerate(snake_body):
+                # 蛇頭用綠色顯示
+                color = OLIVE_GREEN if i == 0 else YELLOW_GREEN 
+                
+                # 蛇的身體
+                pygame.draw.rect(
+                    self.window,
+                    color,
+                    (x * cell_size, y * cell_size, cell_size, cell_size)
+                )
+
+                # 可選：繪製網格線
+                pygame.draw.rect(
+                    self.window,
+                    DARK_GRAY,
+                    (x * cell_size, y * cell_size, cell_size, cell_size),
+                    1 # 邊框厚度為 1 像素
+                )
+
+            pygame.display.flip()
+            self.clock.tick(self.metadata["render_fps"])
+            
 
     # 5. 釋放資源 (Close)
     def close(self):
-        pass
+        if self.window is not None:
+            pygame.display.quit()
+            pygame.quit()
+            self.window = None
 
 if __name__=="__main__":
     env = gym.make('SnakeGame-v0', render_mode='human') 
-    # ... (省略測試代碼)
+
+    # 以下是測試用
+    obs, info = env.reset()
+    terminated = False
+    truncated = False
+    total_reward = 0
+    
+    while not terminated and not truncated:
+        action = env.action_space.sample() 
+        obs, reward, terminated, truncated, info = env.step(action)
+        total_reward += reward
+
+        # Pygame 事件處理
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminated = True
+        
+    print(f"遊戲結束！總步數: {env.unwrapped.current_step}, 總獎勵: {total_reward:.2f}")
+
     env.close()

@@ -1,0 +1,9 @@
+# Python 虛擬環境
+venv/
+.venv/
+env/
+.env/
+
+# Pygame 和 Python 編譯產生的檔案
+__pycache__/
+*.pyc
