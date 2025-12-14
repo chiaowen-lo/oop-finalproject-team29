@@ -67,10 +67,13 @@ python snake_env.py
 ### Part 3 Technical Details (技術細節)
 
 #### 1. 系統架構 (OOP Architecture)
-我們將系統拆分為三個核心物件：
+我們的系統分為決策層與環境層：
 
-* **`SnakeEnv` (Inherits `gym.Env`)**: 控制器，負責協調物件互動並計算 **11維相對視角狀態**。
-* **`Snake` & `Food`**: 封裝移動、生長與重生邏輯，獨立於環境之外。
+* **`QLearningAgent` (Brain)**: 位於 `agent.py`。負責決策邏輯，包含 **Q-Table 更新** 與 **Flood Fill 安全機制**。它不依賴遊戲內部實作，僅透過標準介面與環境互動。
+* **`SnakeEnv` (Environment)**: 位於 `snake_env.py`，繼承自 `gym.Env`。負責封裝遊戲規則、計算 Reward 與回傳 **11維相對視角狀態**。
+* **`Snake` & `Food` (Game Objects)**: 負責底層的座標計算與碰撞偵測，由 `SnakeEnv` 統一管理。
+
+![UML Class Diagram](./part3/diagrams/uml.png)
 
 #### 2. 演算法機制 (Methodology)
 * **Training (Q-Learning)**: 利用 11 維布林值狀態 (危險偵測、移動方向、食物方位) 進行高效率訓練。
