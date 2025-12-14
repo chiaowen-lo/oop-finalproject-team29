@@ -79,7 +79,7 @@ python snake_env.py
 
 ## Dependencies (安裝與依賴)
 
-本專案基於 **Python 3.8+** 開發。在執行任何程式碼之前，請確保已安裝下列 Python 套件：
+本專案基於 **Python 3.8+** 開發。在執行 Part 3 之前，請確保已安裝下列 Python 套件：
 
 ```bash
 pip install gymnasium numpy pygame matplotlib
