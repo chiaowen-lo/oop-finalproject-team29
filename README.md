@@ -12,7 +12,7 @@
 
 ### Part 2: Frozen Lake Optimization (SARSA & Map Scavenging)
 * **目標**：解決 `FrozenLake-v1` 8x8 (Slippery) 難題，達成 >0.70 的穩定成功率。
-* **內容**：有別於傳統 Q-Learning，我們選擇實作 **SARSA (On-Policy)** 演算法以學習更安全的路徑，並開發**地圖篩選機制 (Map Scavenging)** 自動尋找可解且合理的隨機地圖 [cite: 104, 105]。
+* **內容**：有別於傳統 Q-Learning，我們選擇實作 **SARSA (On-Policy)** 演算法以學習更安全的路徑，並開發**地圖篩選機制 (Map Scavenging)** 自動尋找可解且合理的隨機地圖。
 
 ### Part 3: Custom Snake AI (Core Project)
 * **目標**：OOP 架構實作、自定義強化學習環境與混合式演算法 (Hybrid AI)。
@@ -75,3 +75,11 @@ python snake_env.py
 #### 2. 演算法機制 (Methodology)
 * **Training (Q-Learning)**: 利用 11 維布林值狀態 (危險偵測、移動方向、食物方位) 進行高效率訓練。
 * **Safety (Flood Fill Algorithm)**: 在測試階段，AI 決定動作前會先使用 **BFS** 計算連通空間。若空間 < 蛇身長度，AI 將強制避開該路徑。
+
+
+## Dependencies (安裝與依賴)
+
+本專案基於 **Python 3.8+** 開發。在執行任何程式碼之前，請確保已安裝下列 Python 套件：
+
+```bash
+pip install gymnasium numpy pygame matplotlib
