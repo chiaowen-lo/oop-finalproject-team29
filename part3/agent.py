@@ -249,38 +249,37 @@ if __name__ == "__main__":
     
     labels = ['Basic', 'Flood Fill']
     x = np.arange(len(labels))
-    width = 0.35
+    width = 0.5
     
-    # 建立 1x2 子圖
-    fig, (ax1, ax3) = plt.subplots(1, 2, figsize=(14, 6))
+    # 修改為 1 列 3 行的子圖配置，把長度跟成功率分開
+    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(18, 6))
 
-    # --- Chart 1: 成功率 & 平均長度 ---
+    # --- Chart 1: 成功率 (Success Rate) ---
     success_rates = [rate_a, rate_b]
-    avg_lengths = [len_a, len_b]
-    
-    rects1 = ax1.bar(x - width/2, success_rates, width, label='Success Rate (%)', color='#88c999')
-    ax2 = ax1.twinx()
-    rects2 = ax2.bar(x + width/2, avg_lengths, width, label='Avg Length', color='#66b3ff')
-    
-    ax1.set_ylabel('Success Rate (%)', color='green', fontsize=12)
-    ax2.set_ylabel('Avg Snake Length', color='blue', fontsize=12)
-    ax1.set_title('Performance: Survival & Growth', fontsize=14)
+    rects1 = ax1.bar(x, success_rates, width, color='#88c999')
+    ax1.set_ylabel('Success Rate (%)', fontsize=12)
+    ax1.set_title('Success Rate (Higher is Better)', fontsize=14)
     ax1.set_xticks(x)
     ax1.set_xticklabels(labels)
     ax1.set_ylim(0, 105)
-    
     ax1.bar_label(rects1, padding=3, fmt='%.1f%%')
+
+    # --- Chart 2: 平均長度 (Avg Length) ---
+    avg_lengths = [len_a, len_b]
+    rects2 = ax2.bar(x, avg_lengths, width, color='#66b3ff')
+    ax2.set_ylabel('Avg Snake Length', fontsize=12)
+    ax2.set_title('Average Length (Higher is Better)', fontsize=14)
+    ax2.set_xticks(x)
+    ax2.set_xticklabels(labels)
     ax2.bar_label(rects2, padding=3, fmt='%.1f')
     
-    # --- Chart 2: 效率指標 (越低越好) ---
+    # --- Chart 3: 效率指標 (Efficiency) ---
     efficiencies = [eff_a, eff_b]
-    rects3 = ax3.bar(x, efficiencies, width=0.5, label='Steps per Food', color='#ff9999')
-    
-    ax3.set_ylabel('Steps per Food (Lower is Better)', color='red', fontsize=12)
-    ax3.set_title('Efficiency Analysis (Cost)', fontsize=14)
+    rects3 = ax3.bar(x, efficiencies, width, color='#ff9999')
+    ax3.set_ylabel('Steps per Food', fontsize=12)
+    ax3.set_title('Efficiency (Lower is Better)', fontsize=14)
     ax3.set_xticks(x)
     ax3.set_xticklabels(labels)
-    
     ax3.bar_label(rects3, padding=3, fmt='%.1f')
 
     plt.tight_layout()
