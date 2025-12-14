@@ -173,7 +173,6 @@ def run_test_session(agent, env, episodes, use_flood_fill, target_reward):
         length_list.append(final_len)
         
         # 計算效率 (Efficiency = Total_Steps / Food_Eaten)
-        # 數值越低代表效率越好 (花越少步數吃到食物)
         if episode_food > 0:
             eff = episode_steps / episode_food
             efficiency_list.append(eff)
@@ -190,6 +189,26 @@ def run_test_session(agent, env, episodes, use_flood_fill, target_reward):
     
     return success_rate, avg_reward, avg_length, avg_efficiency
 
+# --- 繪製訓練曲線函式 (Moving Average) ---
+def plot_training_curve(rewards, filename="training_curve.png", window=100):
+    plt.figure(figsize=(10, 6))
+    
+    # 計算移動平均 (讓曲線變平滑，不然會太亂)
+    if len(rewards) >= window:
+        moving_avg = np.convolve(rewards, np.ones(window)/window, mode='valid')
+        plt.plot(moving_avg, label=f'Moving Average (Window={window})', color='blue')
+    else:
+        plt.plot(rewards, label='Total Reward', color='alpha_blue')
+
+    plt.title('Training Progress: Reward over Episodes')
+    plt.xlabel('Episode')
+    plt.ylabel('Total Reward')
+    plt.legend()
+    plt.grid(True)
+    plt.savefig(filename)
+    print(f"Training curve saved as '{filename}'")
+    plt.close() # 關閉圖表釋放記憶體
+
 # --- 主程式 ---
 if __name__ == "__main__":
     
@@ -198,6 +217,7 @@ if __name__ == "__main__":
     TEST_EPISODES = 1000
     TARGET_REWARD = 200 
     MODEL_FILE = "q_table_20x20.pkl"
+    LOG_FILE = "training_log.txt"
 
     # ==========================
     # 1. 訓練階段 (Training Phase)
@@ -205,22 +225,45 @@ if __name__ == "__main__":
     env = gym.make('SnakeGame-v0', render_mode=None, size=MAP_SIZE)
     agent = QLearningAgent(action_space_n=env.action_space.n, epsilon_decay=0.9997)
 
-    print(f"[Step 1] Training... {TRAIN_EPISODES} Episodes")
-    for episode in range(TRAIN_EPISODES):
-        state, info = env.reset()
-        done = False
-        while not done:
-            action = agent.get_action(state)
-            next_state, reward, term, trunc, info = env.step(action)
-            done = term or trunc
-            agent.update(state, action, reward, next_state, done)
-            state = next_state
-        agent.decay_epsilon()
-        if (episode + 1) % 1000 == 0:
-            print(f"   Ep {episode+1}, Epsilon: {agent.epsilon:.4f}")
+    # 用來畫圖的陣列
+    training_rewards = []
 
-    print("Training Completed!")
+    # 開啟 Log 檔案準備寫入
+    with open(LOG_FILE, "w") as f:
+        f.write("Episode,Reward,Epsilon\n") # 寫入標題
+
+        print(f"[Step 1] Training... {TRAIN_EPISODES} Episodes")
+        
+        for episode in range(TRAIN_EPISODES):
+            state, info = env.reset()
+            done = False
+            total_reward = 0
+            
+            while not done:
+                action = agent.get_action(state)
+                next_state, reward, term, trunc, info = env.step(action)
+                done = term or trunc
+                agent.update(state, action, reward, next_state, done)
+                state = next_state
+                total_reward += reward # 累加分數
+            
+            agent.decay_epsilon()
+            
+            # 紀錄數據
+            training_rewards.append(total_reward)
+            
+            # 每回合寫入 Log (或是每 10 回合寫一次也可以，這裡每回合都寫)
+            f.write(f"{episode+1},{total_reward:.2f},{agent.epsilon:.5f}\n")
+
+            if (episode + 1) % 1000 == 0:
+                print(f"   Ep {episode+1}, Epsilon: {agent.epsilon:.4f}, Last Reward: {total_reward:.2f}")
+
+    print(f"Training Completed! Log saved to '{LOG_FILE}'")
     agent.save_model(MODEL_FILE)
+    
+    # 🔥 訓練結束後，馬上畫訓練曲線圖
+    plot_training_curve(training_rewards, filename="training_curve.png")
+    
     env.close()
 
     # ==========================
@@ -243,7 +286,7 @@ if __name__ == "__main__":
     test_env.close()
 
     # ==========================
-    # 3. 視覺化圖表 (Visualization)
+    # 3. 視覺化比較圖表 (Visualization)
     # ==========================
     print("\nGenerating Comparison Charts...")
     
@@ -251,10 +294,10 @@ if __name__ == "__main__":
     x = np.arange(len(labels))
     width = 0.5
     
-    # 修改為 1 列 3 行的子圖配置，把長度跟成功率分開
+    # 1 列 3 行的比較圖
     fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(18, 6))
 
-    # --- Chart 1: 成功率 (Success Rate) ---
+    # Chart 1: 成功率
     success_rates = [rate_a, rate_b]
     rects1 = ax1.bar(x, success_rates, width, color='#88c999')
     ax1.set_ylabel('Success Rate (%)', fontsize=12)
@@ -264,7 +307,7 @@ if __name__ == "__main__":
     ax1.set_ylim(0, 105)
     ax1.bar_label(rects1, padding=3, fmt='%.1f%%')
 
-    # --- Chart 2: 平均長度 (Avg Length) ---
+    # Chart 2: 平均長度
     avg_lengths = [len_a, len_b]
     rects2 = ax2.bar(x, avg_lengths, width, color='#66b3ff')
     ax2.set_ylabel('Avg Snake Length', fontsize=12)
@@ -273,7 +316,7 @@ if __name__ == "__main__":
     ax2.set_xticklabels(labels)
     ax2.bar_label(rects2, padding=3, fmt='%.1f')
     
-    # --- Chart 3: 效率指標 (Efficiency) ---
+    # Chart 3: 效率
     efficiencies = [eff_a, eff_b]
     rects3 = ax3.bar(x, efficiencies, width, color='#ff9999')
     ax3.set_ylabel('Steps per Food', fontsize=12)
