@@ -83,3 +83,11 @@ python snake_env.py
 
 ```bash
 pip install gymnasium numpy pygame matplotlib
+```
+## Contribution List (成員貢獻)
+
+| 成員&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | 學號 | 負責項目 |
+| :--- | :--- | :--- |
+| <small>**羅巧雯**</small> | B123245020 | **Part 2**: 實作 SARSA 演算法與地圖篩選機制 (Map Scavenging)。<br>**Part 3**: 負責 Q-Learning 訓練邏輯、Flood Fill 安全機制實作 (`agent.py`) 與數據分析。 |
+| <small>**林芷榆**</small> | B123245027 | **Part 3**: 負責 `SnakeEnv` 環境架構 (Gym Interface)、OOP 設計 (封裝/繼承)、11維相對視角狀態設計、以及技術文件 (UML + README)。 |
+| <small>**楊子嫻**</small> | B123245029 | **Part 3**: 負責遊戲物件 (`Snake`, `Food`) 的邏輯封裝、 Pygame 視覺化呈現 (`render`)、Demo Slides (PDF) 以及 Reflection Report。 |
